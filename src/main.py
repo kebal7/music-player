@@ -1,6 +1,8 @@
 from tkinter import *
 import os
 import pygame
+import time
+from mutagen.mp3 import MP3
 
 root = Tk()
 root.title('Music Player')
@@ -33,7 +35,26 @@ pygame.mixer.music.load(song_path)
 is_playing = False
 is_paused = False
 
+
 # === Functions ===
+
+#Grab Song Length Time Info
+def play_time():
+    current_time = pygame.mixer.music.get_pos()/1000
+    converted_current_time = time.strftime('%M:%S', time.gmtime(current_time))
+    
+    #get song length with mutagen
+    song = song_path
+    song_mut = MP3(song)
+    song_length = song_mut.info.length
+    converted_song_length = time.strftime('%M:%S', time.gmtime(song_length))
+
+    #output time to status bar
+    status_bar.config(text=f'Time Elapsed: {converted_current_time} of {converted_song_length} ')
+
+    #update time
+    status_bar.after(1000, play_time)
+
 def toggle_play():
     global is_playing, is_paused
     if is_playing:
@@ -50,6 +71,7 @@ def toggle_play():
         else:
             # First time play
             pygame.mixer.music.play()
+            play_time()
         is_playing = True
         is_paused = False
         pause_btn.grid(row=0, column=1, padx=7, pady=10)
@@ -66,5 +88,9 @@ next_btn.grid(row=0, column=2, padx=7, pady = 10)
 prev_btn.grid(row=0, column=0, padx=7, pady = 10)
 
 pause_btn.grid_remove() #Initially Hidden
+
+#Create Status Bar
+status_bar = Label(root, text='', bd=1, relief=GROOVE, anchor=E)
+status_bar.pack(fill=X, side=BOTTOM, ipady=2)
 
 root.mainloop()
