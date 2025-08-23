@@ -3,10 +3,11 @@ import os
 import pygame
 import time
 from mutagen.mp3 import MP3
+import tkinter.ttk as ttk
 
 root = Tk()
 root.title('Music Player')
-root.geometry("550x350")
+root.geometry("550x450")
 
 songlist = Listbox(root, bg="black", fg="white", width=100, height=15)
 songlist.pack()
@@ -46,14 +47,19 @@ def play_time():
     #get song length with mutagen
     song = song_path
     song_mut = MP3(song)
+    global song_length
     song_length = song_mut.info.length
     converted_song_length = time.strftime('%M:%S', time.gmtime(song_length))
 
     #output time to status bar
     status_bar.config(text=f'Time Elapsed: {converted_current_time} of {converted_song_length} ')
-
+    slider.config(value=current_time)
     #update time
     status_bar.after(1000, play_time)
+
+#create slider
+def slide(x):
+    slider_label.config(text=f'{int(slider.get())} of {int(song_length)}')
 
 def toggle_play():
     global is_playing, is_paused
@@ -72,6 +78,11 @@ def toggle_play():
             # First time play
             pygame.mixer.music.play()
             play_time()
+
+            #update slider to position
+            slider_position = int(song_length)
+            slider.config(to=slider_position, value=0)
+
         is_playing = True
         is_paused = False
         pause_btn.grid(row=0, column=1, padx=7, pady=10)
@@ -88,6 +99,14 @@ next_btn.grid(row=0, column=2, padx=7, pady = 10)
 prev_btn.grid(row=0, column=0, padx=7, pady = 10)
 
 pause_btn.grid_remove() #Initially Hidden
+
+#create slider
+slider = ttk.Scale(root, from_=0, to=100, orient=HORIZONTAL, value=0, command=slide, length = 360)
+slider.pack(pady=20)
+
+#create slider label
+slider_label = Label(root, text="0")
+slider_label.pack(pady=10)
 
 #Create Status Bar
 status_bar = Label(root, text='', bd=1, relief=GROOVE, anchor=E)
