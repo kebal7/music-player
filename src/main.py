@@ -29,27 +29,31 @@ pygame.mixer.init()
 song_path = os.path.join(script_dir, "..", "resources", "music", "monta_rey.mp3")
 pygame.mixer.music.load(song_path)
 
-#track playing state
+# Track playing state
 is_playing = False
+is_paused = False
 
-# Toggle function
+# === Functions ===
 def toggle_play():
-    global is_playing
+    global is_playing, is_paused
     if is_playing:
         # Pause music
         pygame.mixer.music.pause()
+        is_playing = False
+        is_paused = True
         play_btn.grid(row=0, column=1, padx=7, pady=10)
         pause_btn.grid_remove()
-        is_playing = False
     else:
-        # Resume or play
-        if not pygame.mixer.music.get_busy():
-            pygame.mixer.music.play()
-        else:
+        if is_paused:
+            # Resume from pause
             pygame.mixer.music.unpause()
+        else:
+            # First time play
+            pygame.mixer.music.play()
+        is_playing = True
+        is_paused = False
         pause_btn.grid(row=0, column=1, padx=7, pady=10)
         play_btn.grid_remove()
-        is_playing = True
 
 play_btn = Button(control_frame, image=play_btn_image, borderwidth=0,command=toggle_play)
 pause_btn = Button(control_frame, image=pause_btn_image, borderwidth=0, command=toggle_play)
