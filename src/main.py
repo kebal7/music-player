@@ -133,8 +133,9 @@ prev_btn.grid(row=0, column=0, padx=7, pady = 10)
 pause_btn.grid_remove() #Initially Hidden
 
 #create slider
-slider = ttk.Scale(root, from_=0, to=100, orient=HORIZONTAL, value=0, command=slide, length = 360)
+slider = ttk.Scale(root, from_=0, to=100, orient=HORIZONTAL, value=0, length = 360)
 slider.pack(pady=20)
+slider.bind("<ButtonRelease-1>", slide)
 
 #create slider label
 slider_label = Label(root, text="0")
