@@ -42,6 +42,10 @@ is_paused = False
 #Grab Song Length Time Info
 def play_time():
     current_time = pygame.mixer.music.get_pos()/1000
+
+    #temp label to get data
+    slider_label.config(text=f'Slider: {int(slider.get())} and Song Pos: {int(current_time)}')
+
     converted_current_time = time.strftime('%M:%S', time.gmtime(current_time))
     
     #get song length with mutagen
@@ -51,15 +55,43 @@ def play_time():
     song_length = song_mut.info.length
     converted_song_length = time.strftime('%M:%S', time.gmtime(song_length))
 
+    current_time += 1
+    
+    if int(slider.get()) == int(song_length):
+        status_bar.config(text=f'Time Elapsed: {converted_song_length} of {converted_song_length} ')
+    elif is_paused:
+        pass
+    elif int(slider.get()) == int(current_time):
+        #slider hasn't been moved    
+        slider_position = int(song_length)
+        slider.config(to=slider_position, value=int(current_time))
+
+    else:
+        #slider has moved
+        slider_position = int(song_length)
+        slider.config(to=slider_position, value=int(slider.get()))
+
+
+        converted_current_time = time.strftime('%M:%S', time.gmtime(int(slider.get())))
+
+        status_bar.config(text=f'Time Elapsed: {converted_current_time} of {converted_song_length} ')
+
+        #move along by one second
+        next_time = int(slider.get()) + 1
+        slider.config(value=next_time)
+
+
     #output time to status bar
-    status_bar.config(text=f'Time Elapsed: {converted_current_time} of {converted_song_length} ')
-    slider.config(value=current_time)
+    #status_bar.config(text=f'Time Elapsed: {converted_current_time} of {converted_song_length} ')
+    #slider.config(value=int(current_time))
+
     #update time
     status_bar.after(1000, play_time)
 
 #create slider
 def slide(x):
-    slider_label.config(text=f'{int(slider.get())} of {int(song_length)}')
+    pygame.mixer.music.play(start=int(slider.get()))
+
 
 def toggle_play():
     global is_playing, is_paused
@@ -80,8 +112,8 @@ def toggle_play():
             play_time()
 
             #update slider to position
-            slider_position = int(song_length)
-            slider.config(to=slider_position, value=0)
+            #slider_position = int(song_length)
+            #slider.config(to=slider_position, value=0)
 
         is_playing = True
         is_paused = False
