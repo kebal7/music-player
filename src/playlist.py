@@ -16,4 +16,6 @@ class Playlist:
 
     def current(self):
         return self.songs[self.index]
-
+    
+    def get_index(self):
+        return self.index

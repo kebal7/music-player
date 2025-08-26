@@ -19,7 +19,7 @@ playlist = Playlist(music_dir)
 player.load(playlist.current())
 
 # --- UI ---
-songlist = Listbox(root, bg="black", fg="white", width=100, height=15)
+songlist = Listbox(root, bg="black", fg="white", width=100, height=15, selectmode=SINGLE, selectbackground="gray", selectforeground="white")
 for s in playlist.songs:
     songlist.insert(END, os.path.basename(s))
 songlist.pack()
@@ -81,6 +81,18 @@ def start_update_time():
     if update_time_id is not None:
         status_bar.after_cancel(update_time_id)
     update_time()
+
+def highlight_current_song():
+    # Clear previous selection
+    songlist.selection_clear(0, END)
+    try:
+        # Get the index of the currently playing song in the playlist
+        current_index = playlist.get_index()
+        songlist.selection_set(current_index)
+        songlist.activate(current_index)
+        songlist.see(current_index)  # scroll to the selected item
+    except Exception as e:
+        print(e)
     
 def toggle_play():
     if player.is_playing:
@@ -92,6 +104,7 @@ def toggle_play():
             player.unpause()
         else:
             player.play()
+            root.after(0,highlight_current_song)
             start_update_time()
         pause_btn.grid()
         play_btn.grid_remove()
