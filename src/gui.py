@@ -20,9 +20,18 @@ player.load(playlist.current())
 
 # --- UI ---
 songlist = Listbox(root, bg="black", fg="white", width=100, height=15, selectmode=SINGLE, selectbackground="gray", selectforeground="white")
-for s in playlist.songs:
-    songlist.insert(END, os.path.basename(s))
-songlist.pack()
+
+# --- Populate Listbox ---
+if playlist.head is not None:
+    node = playlist.head
+    while True:
+        songlist.insert(END, os.path.basename(node.song))
+        node = node.next
+        if node == playlist.head:
+            break
+
+        
+songlist.pack(pady=10)
 
 play_img = PhotoImage(file=os.path.join(image_dir, "play.png"))
 pause_img = PhotoImage(file=os.path.join(image_dir, "pause.png"))
