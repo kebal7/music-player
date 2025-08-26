@@ -41,6 +41,8 @@ is_paused = False
 
 #Grab Song Length Time Info
 def play_time():
+    if not pygame.mixer.music.get_busy():
+        return  # stop updating when nothing is playing
     current_time = pygame.mixer.music.get_pos()/1000
 
     #temp label to get data
@@ -48,11 +50,6 @@ def play_time():
 
     converted_current_time = time.strftime('%M:%S', time.gmtime(current_time))
     
-    #get song length with mutagen
-    song = song_path
-    song_mut = MP3(song)
-    global song_length
-    song_length = song_mut.info.length
     converted_song_length = time.strftime('%M:%S', time.gmtime(song_length))
 
     current_time += 1
@@ -90,8 +87,13 @@ def play_time():
 
 #create slider
 def slide(x):
-    pygame.mixer.music.play(start=int(slider.get()))
-
+    #pygame.mixer.music.play(start=int(slider.get()))
+    pos = int(slider.get())
+    if pygame.mixer.music.get_busy():
+        pygame.mixer.music.set_pos(pos)
+    else:
+        pygame.mixer.music.play(start=pos)
+        play_time()
 
 def toggle_play():
     global is_playing, is_paused
@@ -109,8 +111,13 @@ def toggle_play():
         else:
             # First time play
             pygame.mixer.music.play()
+            
+            #get song length with mutagen
+            song_mut = MP3(song_path)
+            global song_length
+            song_length = song_mut.info.length
+            
             play_time()
-
             #update slider to position
             #slider_position = int(song_length)
             #slider.config(to=slider_position, value=0)
