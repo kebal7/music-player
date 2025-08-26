@@ -89,7 +89,7 @@ def play_time():
 def slide(x):
     #pygame.mixer.music.play(start=int(slider.get()))
     pos = int(slider.get())
-    if pygame.mixer.music.get_busy():
+    if player.get_busy:
         pygame.mixer.music.set_pos(pos)
     else:
         pygame.mixer.music.play(start=pos)
